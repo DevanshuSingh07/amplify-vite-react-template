@@ -4,13 +4,13 @@ import { generateClient } from "aws-amplify/data";
 import { useAuthenticator } from '@aws-amplify/ui-react';
 const client = generateClient<Schema>();
 
-
-  const { signOut } = useAuthenticator();
   
   function deleteTodo(id: string) {
     client.models.Todo.delete({ id })
   }
 function App() {
+
+  const { signOut } = useAuthenticator();
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function App() {
 
   return (
     <main>
-            <button onClick={signOut}>Sign out</button>
+          
       <h1>My todos</h1>
       <button onClick={createTodo}>+ new</button>
       <ul>
@@ -39,7 +39,9 @@ function App() {
         <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
           Review next step of this tutorial.
         </a>
+        
       </div>
+      <button onClick={signOut}>Sign out</button>
     </main>
   );
 }
