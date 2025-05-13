@@ -1,4 +1,6 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { handler } from "../my-first-function/handler";
+import { myFirstFunction } from "../my-first-function/resource";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -10,8 +12,29 @@ const schema = a.schema({
   Todo: a
     .model({
       content: a.string(),
+      idDone:a.boolean()
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [
+       // Authenticated users can read (optional, adjust as needed)
+    allow.owner(),
+    ]),
+
+    Notes:a.model({
+      text:a.string()
+    }).authorization((allow) => [
+       allow.publicApiKey().to(['read']), // Public can read (optional, adjust as needed)
+    allow.authenticated().to(['read']), // Authenticated users can read (optional, adjust as needed)
+    allow.owner(),
+    ]),
+      
+  myFirstFunction: a
+    .query()
+    .arguments({
+      name: a.string(),
+    })
+    .returns(a.string())
+    .authorization(allow => [allow.publicApiKey()])
+    .handler(a.handler.function(myFirstFunction)),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -19,13 +42,15 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
+    defaultAuthorizationMode:"userPool",
     // API Key is used for a.allow.public() rules
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
   },
 });
+
+
 
 /*== STEP 2 ===============================================================
 Go to your frontend source code. From your client-side code, generate a
